@@ -44,20 +44,28 @@ class Utils:
 
     @classmethod
     def connect_wifi(cls, ssid: str, password: str, timeout_sec: int = 20):
-        """Connect to WiFi with timeout."""
+        """Connect to WiFi with timeout and verify IP assignment."""
         wlan = network.WLAN(network.STA_IF)
         wlan.active(True)
 
-        if not wlan.isconnected():
-            wlan.connect(ssid, password)
+        # Ensure clean state
+        if wlan.isconnected():
+            wlan.disconnect()
+            time.sleep(1)
 
-            start = time.time()
-            while not wlan.isconnected():
-                if time.time() - start > timeout_sec:
-                    raise OSError("Wi-Fi connection failed (timeout).")
-                time.sleep(0.5)
+        wlan.connect(ssid, password)
 
-        return wlan
+        start = time.time()
+        while True:
+            if wlan.isconnected():
+                ip_info = wlan.ifconfig()
+                if ip_info[0] != "0.0.0.0":  # Check if IP assigned
+                    print("Connected! IP:", ip_info[0])
+                    return wlan
+            if time.time() - start > timeout_sec:
+                raise OSError("Wi-Fi connection failed (timeout).")
+            time.sleep(0.5)
+
 
 
 class Logger: 
