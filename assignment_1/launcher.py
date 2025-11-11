@@ -262,7 +262,7 @@ class DHTMQTTPublisher:
 
                 # TASK 8.iii: Create message in required format
                 # Format: UNIX_TS, TEMPERATURE_VALUE, C, HUMIDITY_VALUE, %, DIGIT_SUM
-                payload = f"{unix_ts}, {temp}, C, {hum}, %, {self.digit_sum}"
+                payload = f"{unix_ts}, {temp}, {hum}, {self.digit_sum}"
                 self._publish_payload(payload)
                 
                 self._logger.info(f"Published payload: {payload}")
